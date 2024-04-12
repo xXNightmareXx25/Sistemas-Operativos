@@ -1,4 +1,4 @@
-#include <stdio.h>
+ #include <stdio.h>
 #include <ncurses.h>
 #include <time.h>
 #include <string.h>
@@ -14,6 +14,10 @@ struct PCB
     int DX;
     int PC;
     int PID;
+    int UID;
+    int P;
+    int KCPU;
+    int KCPUxU;
     char fileName[256];
     FILE *programa; //puntero a un archivo
     int estado; // Campo para representar el estado del proceso
@@ -531,4 +535,3 @@ int EjecutarInstruccion(WINDOW *IDventanaRegistros, WINDOW *IDventanaMensajes, s
     // No hay error
     codigoError = 0;
     return 0;
-}
