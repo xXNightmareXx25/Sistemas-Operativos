@@ -13,11 +13,13 @@ int MAXQUANTUM = 5;
 int Delay = 300000;
 int codigoError = 0;
 int ContadorHistorial  = 0;
+int NumeroUsuarios = 0;
 int IncCPU=60/5;
 int PBase=60;
-int NumUs=0;
+int IDUs=0;
 float W=0.0;
 char Users[200];
+int MinP=0;
 
 /**
  * VentanaMensajes
@@ -89,7 +91,7 @@ void VentanaPrompt(WINDOW *IDventanaPromt, int NumLinea, char *ComandoIngresado)
  * Descripción:
  * - Esta función configura el color de fondo de la ventana de registros y dibuja un borde alrededor de ella.
  * - Imprime el título "REGISTROS" en la parte superior de la ventana.
- * - Muestra los valores de los registros AX, BX, CX, DX, PC, IR, PID y nombre del archivo en la ventana.
+ * - Muestra los valores de los registros AX, BX, CX, DX, PC, IR, PID, UID, P, KCPU, KCPUxU y nombre del archivo en la ventana.
  * - Actualiza la ventana de registros y vuelve a dibujar el borde.
 */
 void VentanaRegistros(WINDOW *IDventanaRegistros, struct PCB *pcb)
@@ -132,7 +134,7 @@ void VentanaRegistros(WINDOW *IDventanaRegistros, struct PCB *pcb)
  * 
  * Descripción:
  * - Esta función muestra la información del proceso en ejecución en la ventana de procesos.
- * - La información impresa incluye el PID, nombre del archivo y los valores de los registros AX, BX, CX, DX, PC e IR.
+ * - La información impresa incluye el PID, nombre del archivo y los valores de los registros AX, BX, CX, DX, PC, IR, KCPU, KCPUxU, UID y P.
  * - Si no hay ningún proceso en ejecución, la ventana de procesos se muestra vacía.
  * - La ventana de procesos se actualiza y se vuelve a dibujar el borde después de imprimir la información.
  */
@@ -148,13 +150,12 @@ void ImprimirEjecutandose(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
         wbkgd(IDventanaProcesos, COLOR_PAIR(4));
         box(IDventanaProcesos, 0, 0);
         mvwprintw(IDventanaProcesos, 0, 2, "LISTA DE PROCESOS");
-        mvwprintw(IDventanaProcesos, 1, 30, "Usuarios: %s", Users);
-        mvwprintw(IDventanaProcesos, 1, 50, "MinP: ");
-        mvwprintw(IDventanaProcesos, 1, 70, "W: ");
         mvwprintw(IDventanaProcesos, 2, 2, "Proceso en Ejecucion: ");
-        mvwprintw(IDventanaProcesos, 3, 2, "PID: %d, UID: %d, P: %d, KCPU: %d, KCPUxU:%d, FILE: %s, AX: %d, BX: %d, CX: %d, DX: %d, PC: %d, IR: %s", primerNodo->PID, primerNodo->UID, primerNodo->P, primerNodo->KCPU, primerNodo->KCPUxU, primerNodo->fileName, primerNodo->AX, primerNodo->BX, primerNodo->CX, primerNodo->DX, primerNodo->PC, primerNodo->IR);
-        wrefresh(IDventanaProcesos);
+        mvwprintw(IDventanaProcesos, 3, 2, "PID: %d, UID: %d, P: %d, KCPU: %d, KCPUxU:%d, FILE: %s, AX: %d, BX: %d, CX: %d, DX: %d, PC: %d, IR: %s", 
+                                            primerNodo->PID, primerNodo->UID, primerNodo->P, primerNodo->KCPU, primerNodo->KCPUxU, primerNodo->fileName, primerNodo->AX, 
+                                            primerNodo->BX, primerNodo->CX, primerNodo->DX, primerNodo->PC, primerNodo->IR);
         box(IDventanaProcesos, 0, 0);
+        wrefresh(IDventanaProcesos);
     }
 }
 
@@ -170,7 +171,7 @@ void ImprimirEjecutandose(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
  * 
  * Descripción:
  * - Esta función recorre la lista de PCB y muestra la información de los procesos en espera en la ventana de procesos.
- * - La información impresa incluye el PID, nombre del archivo, valores de los registros AX, BX, CX, DX, PC e IR.
+ * - La información impresa incluye el PID, nombre del archivo, valores de los registros AX, BX, CX, DX, PC, IR, KCPU, KCPUxU, UID y P.
  * - La ventana de procesos se actualiza y se vuelve a dibujar el borde después de imprimir la información.
  * - Si no hay procesos en espera, se muestra un mensaje vacío en la ventana de procesos.
  */
@@ -193,16 +194,16 @@ void ImprimirListos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
             wmove(IDventanaProcesos, 11 + i, 2);
             wclrtoeol(IDventanaProcesos);
             mvwprintw(IDventanaProcesos, 11 + i, 2, "PID: %d, UID: %d, P: %d, KCPU: %d, KCPUxU: %d, FILE: %s, AX: %d, BX: %d, CX: %d, DX: %d, PC: %d, IR: %s",
-                      NodoActual->PID, NodoActual->UID, NodoActual->P, NodoActual->KCPU, NodoActual->KCPUxU, NodoActual->fileName, NodoActual->AX, NodoActual->BX, NodoActual->CX, NodoActual->DX, NodoActual->PC, NodoActual->IR);
+                      NodoActual->PID, NodoActual->UID, NodoActual->P, NodoActual->KCPU, NodoActual->KCPUxU, NodoActual->fileName, NodoActual->AX, NodoActual->BX, 
+                      NodoActual->CX, NodoActual->DX, NodoActual->PC, NodoActual->IR);
             NodoActual = NodoActual->sig;
             i++;
             contador++; // Incrementar el contador de procesos en espera
             mvwprintw(IDventanaProcesos, 10 + contador, 2, "                                                                                                     ");
                                                                 
         }
-
-        wrefresh(IDventanaProcesos);
         box(IDventanaProcesos, 0, 0);
+        wrefresh(IDventanaProcesos);
     }
     else if (NodoActual == NULL)
     {
@@ -222,7 +223,7 @@ void ImprimirListos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
  * 
  * Descripción:
  * - Esta función recorre la lista de PCB y muestra la información de los procesos terminados en la ventana de procesos.
- * - La información impresa incluye el PID, nombre del archivo, valores de los registros AX, BX, CX, DX, PC e IR.
+ * - La información impresa incluye el PID, nombre del archivo, valores de los registros AX, BX, CX, DX, PC, IR, KCPU, KCPUxU, UID y P.
  * - La ventana de procesos se actualiza y se vuelve a dibujar el borde después de imprimir la información.
  */
 void ImprimirTerminados(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
@@ -235,7 +236,6 @@ void ImprimirTerminados(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
     if (NodoActual != NULL)
     {
         wbkgd(IDventanaProcesos, COLOR_PAIR(4));                              // Establecer el color de fondo de la ventana
-        box(IDventanaProcesos, 0, 0);                                         // Dibujar el borde de la ventana
         mvwprintw(IDventanaProcesos, 0, 2, "LISTA DE PROCESOS");              // Título
         mvwprintw(IDventanaProcesos, height / 2, 2, "Procesos Terminados: "); // Título de la sección de procesos terminados
 
@@ -243,16 +243,16 @@ void ImprimirTerminados(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
         while (NodoActual != NULL)
         {
             mvwprintw(IDventanaProcesos, height / 2 + 1 + i, 2, "PID: %d, UID: %d, P: %d, KCPU: %d, KCPUxU: %d, FILE: %s, AX: %d, BX: %d, CX: %d, DX: %d, PC: %d, IR: %s",
-                      NodoActual->PID, NodoActual->UID, NodoActual->P, NodoActual->KCPU, NodoActual->KCPUxU,NodoActual->fileName, NodoActual->AX, NodoActual->BX, NodoActual->CX, NodoActual->DX, NodoActual->PC, NodoActual->IR);
+                      NodoActual->PID, NodoActual->UID, NodoActual->P, NodoActual->KCPU, NodoActual->KCPUxU,NodoActual->fileName, NodoActual->AX, NodoActual->BX, NodoActual->CX, 
+                      NodoActual->DX, NodoActual->PC, NodoActual->IR);
             NodoActual = NodoActual->sig;
             i++;
         }
-
-        wrefresh(IDventanaProcesos);  // Actualizar la ventana
         box(IDventanaProcesos, 0, 0); // Volver a dibujar el borde de la ventana
+        mvwprintw(IDventanaProcesos, 0, 2, "LISTA DE PROCESOS");              // Título
+        wrefresh(IDventanaProcesos);  // Actualizar la ventana
     }
 }
-
 
 /*
 ---------- BIBLIA PARA LOS CODIGOS DE ERROR COMANDOS -----------
@@ -283,6 +283,8 @@ void ImprimirTerminados(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
  * - Opción 242: Mensaje de error para archivo inexistente.
  * - Opción 243: Mensaje de error para exceso de parámetros en el comando "cargar".
  * - Opción 244: Mensaje de error para falta de nombre de archivo en el comando "cargar".
+ * - Opción 245: Mensaje de error para falta de usuario en el comando "cargar".
+ * - Opción 246: Mensaje de error para usuario no valido en el comando "cargar".
  * - Opción 301: Mensaje de estado para ejecutar el comando "kill".
  * - Opción 341: Mensaje de error para parámetro no entero en el comando "kill".
  * - Opción 141: Mensaje de error para comando no reconocido.
@@ -337,16 +339,24 @@ int ManejadorErroresComandos(WINDOW *IDventanaPrompt, WINDOW *IDventanaMensajes,
         break;
 
     case 244:
-        VentanaMensajes(IDventanaMensajes, "                                                                        ");
-        VentanaMensajes(IDventanaMensajes, "Error: No se ingresó un nombre de ArchivoCargado, uso: cargar <nombre_archivo>");
+        VentanaMensajes(IDventanaMensajes, "                                                                                                               ");
+        VentanaMensajes(IDventanaMensajes, "No se ingresó un nombre de archivo ni usuario, uso: load <nombre_archivo> <numero_de_usuario> ");
         memset(ComandoIngresado, 0, (*j));
         (*j) = 0;
         VentanaPrompt(IDventanaPrompt, *NumLinea, ComandoIngresado);
         break;
 
     case 245:
-        VentanaMensajes(IDventanaMensajes, "                                                                        ");
+        VentanaMensajes(IDventanaMensajes, "                                                                                                                              ");
         VentanaMensajes(IDventanaMensajes, "Error: Ingresa el numero de usuario: load <nombre_archivo> <numero_de_usuario> ");
+        memset(ComandoIngresado, 0, (*j));
+        (*j) = 0;
+        VentanaPrompt(IDventanaPrompt, *NumLinea, ComandoIngresado);
+        break;
+
+        case 246:
+        VentanaMensajes(IDventanaMensajes, "                                                                                                                               ");
+        VentanaMensajes(IDventanaMensajes, "Error: El numero de usuario no es valido. ");
         memset(ComandoIngresado, 0, (*j));
         (*j) = 0;
         VentanaPrompt(IDventanaPrompt, *NumLinea, ComandoIngresado);
@@ -355,7 +365,7 @@ int ManejadorErroresComandos(WINDOW *IDventanaPrompt, WINDOW *IDventanaMensajes,
 
     // Estados de Kill (30X)
     case 301: 
-        VentanaMensajes(IDventanaMensajes, "                                                                        ");
+        VentanaMensajes(IDventanaMensajes, "                                                                                                                        ");
         VentanaMensajes(IDventanaMensajes, "Estado: Ejecutando Kill");
         memset(ComandoIngresado, 0, (*j));
         (*j) = 0;
@@ -578,7 +588,6 @@ void ManejadorErroresEjecucion(WINDOW *IDventanaMensajes, int Opcion)
     wrefresh(IDventanaMensajes);
 }
 
-
 /**
  * Enter
  * 
@@ -590,6 +599,8 @@ void ManejadorErroresEjecucion(WINDOW *IDventanaMensajes, int Opcion)
  * - 666 si el comando es "SALIR", "EXIT" o "MORIR".
  * - 243 si se proporcionaron demasiados parámetros en el comando "CARGAR" o "LOAD".
  * - 244 si falta el nombre del archivo en el comando "CARGAR" o "LOAD".
+ * - 245 si falta el número de usuario en el comando "CARGAR" o "LOAD".
+ * - 246 si el número de usuario no es válido en el comando "CARGAR" o "LOAD".
  * - 201 si el archivo se cargó exitosamente en el comando "CARGAR" o "LOAD".
  * - 242 si el archivo especificado no existe en el comando "CARGAR" o "LOAD".
  * - 341 si falta el PID del proceso en el comando "KILL" o "MATAR".
@@ -635,11 +646,17 @@ int Enter(char *ComandoIngresado)
     param1[0] = '\0'; // Limpiar el primer parámetro
     Users[0] = '\0'; // Limpiar el número de usuario
 
-    // Intentar leer el nombre del archivo a cargar y el número de usuario
-    if (sscanf(ComandoIngresado, "%*s %s %s", param1, Users) != 2) {
-      return 243; // Error: se proporcionaron demasiados o pocos parámetros
+    if (sscanf(ComandoIngresado, "%*s %s %s", param1, Users) == 2){
+      if(atoi(Users)<=0){
+        return 246; // Error: el número de usuario no es válido
+      }
     }
 
+    // Intentar leer el nombre del archivo a cargar y el número de usuario
+    if (sscanf(ComandoIngresado, "%*s %s %s %s", param1, Users,param3) == 3) {
+      return 243; // Error: se proporcionaron demasiados o pocos parámetros
+    }
+    
     // Comprobar si no se proporcionó ningún nombre de archivo
     if (param1[0] == '\0') {
       return 244; // Error: falta el nombre del archivo
@@ -653,6 +670,9 @@ int Enter(char *ComandoIngresado)
     // Verificar si el archivo existe
     else if (access(param1, F_OK) != -1) {
       strcpy(ArchivoCargado, param1); // Guardar el nombre del archivo cargado
+      
+      IDUs = atoi(Users); // Guardar el número de usuario
+      
       return 201; // Archivo cargado exitosamente
     } else {
       return 242; // Error: el archivo no existe
@@ -695,6 +715,119 @@ int Enter(char *ComandoIngresado)
   return 0; // Alcanzado solo si hay errores de compilación (generalmente nunca se retorna)
 }
 
+/*
+    *IdentificadorProcesos
+    *
+    * Parámetros:
+    * - IDventanaProcesos: Puntero a la ventana de procesos.
+    * - NodoEjecucion: Puntero al primer nodo de la lista de procesos en ejecución.
+    * - NodosListos: Puntero al primer nodo de la lista de procesos listos.
+    * - ProcesoCargado: Puntero a la variable que indica si hay un proceso cargado.
+    * 
+    * Objetivo:
+    * - Identificar los procesos en la lista de procesos.
+    * 
+    * Descripción:
+    * - La función IdentificadorProcesos recorre la lista de procesos y cuenta el número de procesos en ejecución y en espera.
+
+*/
+
+void IdentificadorProcesos(WINDOW *IDventanaProcesos, struct PCB *NodoEjecucion, struct PCB *NodosListos, int *ProcesoCargado){
+
+  int height, width;
+  getmaxyx(stdscr, height, width); // Obtener las dimensiones de la pantalla
+
+  // Contador de procesos en espera
+  (*ProcesoCargado) = 0;
+  
+  // Contador de procesos en ejecución
+  while (NodoEjecucion != NULL)
+  {
+    int UIContado=0;
+    struct PCB *temp = NodosListos;
+
+    // Verificar si el proceso ya fue contado
+    while (temp != NULL)
+    {
+      // Si el UID del proceso ya fue contado, no se incrementa el contador
+      if (NodoEjecucion->UID == temp->UID)
+      {
+        UIContado=1;
+        break;
+      }
+      temp = temp->sig;// Se pasa al siguiente proceso
+    }
+    // Si el UID del proceso no fue contado, se incrementa el contador
+    if(!UIContado){
+      (*ProcesoCargado)++;
+    }
+    // Se pasa al siguiente proceso en ejecución
+    NodoEjecucion = NodoEjecucion->sig;
+  }
+  // Contador de procesos en espera
+  while(NodosListos != NULL){
+    int UIContado=0;
+    struct PCB *temp = NodosListos->sig;
+
+    // Verificar si el proceso ya fue contado
+    while (temp != NULL)
+    {
+      // Si el UID del proceso ya fue contado, no se incrementa el contador
+      if (NodosListos->UID == temp->UID)
+      {
+        UIContado=1;
+        break;
+      }
+      temp = temp->sig;
+    }
+    // Si el UID del proceso no fue contado, se incrementa el contador
+    if(!UIContado){
+      (*ProcesoCargado)++;
+    }
+    // Se pasa al siguiente proceso en espera
+    NodosListos = NodosListos->sig;
+  }
+
+  // Imprimir el número de procesos en la ventana de procesos
+  MinP=MinimaPrioridad();
+  mvwprintw(IDventanaProcesos, 1, 30, "Usuarios: %d        MinP:%d       W: %.3f", (*ProcesoCargado), MinP, W);
+  wrefresh(IDventanaProcesos);
+
+}
+
+/*
+    * Planificador.
+    * 
+    * Parámetros:
+    * - PrimerNodo: Puntero al primer nodo de la lista.
+    * - PBase: Prioridad base de los procesos
+    * - W: Peso de los usuarios,
+    * 
+    * Objetivo:
+    * - Planificar los procesos
+    * 
+    * Descripción:
+    * - Recorre la lista de procesos y actualiza la prioridad de cada proceso.
+    
+*/
+
+void Planificador(struct PCB **PrimerNodo, int PBase, float W){
+  
+    struct PCB *Actual = *PrimerNodo;
+
+    // Recorrer la lista de procesos
+    while (Actual != NULL) {
+      
+        Actual->KCPU /= 2;
+        Actual->KCPUxU/=2;
+
+        // Instrucciones para planificar      
+        int Pactual= PBase + (Actual->KCPU)/2 + (Actual->KCPUxU)/(4*W);
+        // Actualizar la prioridad del proceso
+        Actual->P = Pactual;
+        Actual = Actual->sig;
+    }
+}
 
 /**
  * LeerArchivo
@@ -713,10 +846,18 @@ int Enter(char *ComandoIngresado)
  * - 0 si la función se ejecutó correctamente.
  * 
  * Objetivo:
- * - Leer una línea del archivo y ejecutarla como instrucción.
+ * - Leer una línea del archivo y ejecutar la instrucción correspondiente.
  * 
  * Descripción:
- * - La función LeerArchivo lee una línea del archivo especificado por n_archivo y la guarda en el IR (Instruction Register) del PCB actual. Si la lectura es exitosa, se convierte la línea a mayúsculas y se ejecuta la instrucción utilizando la función EjecutarInstruccion. Luego, se incrementa el contador de programa (PC) y el quantum actual. La función también actualiza la ventana de registros con la información del PCB actual. Si se produce un error al ejecutar la instrucción, se cierra el archivo, se indica que no se puede seguir leyendo, se reinicia el quantum y se muestra un mensaje de error al usuario. Si se llega al final del archivo, se cierra el archivo, se indica que no se puede seguir leyendo, se reinicia el quantum y se muestra un mensaje de fin de archivo al usuario. Si el quantum actual alcanza el máximo permitido, se indica que no se puede seguir leyendo, se indica que no hay un proceso cargado, se inserta el PCB actual en la lista de procesos listos, se elimina el proceso actual y se reinicia el quantum. Finalmente, la función se duerme durante un tiempo determinado para evitar un uso excesivo de la CPU.
+ * - La función LeerArchivo lee una línea del archivo especificado por n_archivo y la guarda en el IR (Instruction Register) del PCB actual. 
+ * Si la lectura es exitosa, se convierte la línea a mayúsculas y se ejecuta la instrucción utilizando la función EjecutarInstruccion. 
+ * Luego, se incrementa el contador de programa (PC) y el quantum actual. La función también actualiza la ventana de registros con la información del 
+ * PCB actual. 
+ * Si se produce un error al ejecutar la instrucción, se cierra el archivo, se indica que no se puede seguir leyendo, se reinicia el quantum y 
+ * se muestra un mensaje de error al usuario. Si se llega al final del archivo, se cierra el archivo, se indica que no se puede seguir leyendo, 
+ * se reinicia el quantum y se muestra un mensaje de fin de archivo al usuario. Si el quantum actual alcanza el máximo permitido, se indica que no 
+ * se puede seguir leyendo, se indica que no hay un proceso cargado, se inserta el PCB actual en la lista de procesos listos, se elimina el proceso 
+ * actual y se reinicia el quantum. Finalmente, la función se duerme durante un tiempo determinado para evitar un uso excesivo de la CPU.
  */
 int LeerArchivo(WINDOW *IDventanaMensajes, WINDOW *IDventanaRegistros, struct PCB **Ejecucion, int *SePuedeLeer, FILE *n_archivo, int *Quantum, int *ProcesoCargado, struct PCB **Listos)
 {
@@ -734,7 +875,29 @@ int LeerArchivo(WINDOW *IDventanaMensajes, WINDOW *IDventanaRegistros, struct PC
         // el código de la instrucción y el quantum actual.
         codigoError = EjecutarInstruccion(IDventanaRegistros, IDventanaMensajes, *Ejecucion, (*Ejecucion)->IR);
 
-        // Se incrementa el contador de programa del PCB actual.
+        // Aumentar contador de uso del CPU para el proceso de ejecucion 
+        (*Ejecucion)->KCPU+=IncCPU;
+
+        //Imprime la prioridad y el peso del nodo listos
+        if(NumeroUsuarios !=0 ){
+
+          //Aumentar el KCPUxU de todos los procesos del usuario dueño del proceso en ejecucion
+
+          (*Ejecucion)->KCPUxU+=IncCPU;
+          struct PCB *temp = *Listos;
+          // Se recorre la lista de listos
+          while (temp != NULL)
+          {
+            // Si el proceso actual es del mismo usuario que el proceso en ejecucion
+            if (temp->UID == (*Ejecucion)->UID)
+            {
+              temp->KCPUxU = (*Ejecucion)->KCPUxU+=IncCPU;
+            }
+            temp = temp->sig;
+          }
+        }
+
+        // Se incrementa el contador de programa (PC) del PCB actual.
         (*Ejecucion)->PC++;
 
         // Se incrementa el quantum actual.
@@ -748,10 +911,13 @@ int LeerArchivo(WINDOW *IDventanaMensajes, WINDOW *IDventanaRegistros, struct PC
         // un mensaje de error al usuario.
         if (codigoError != 0)
         {
+          // Se cierra el archivo, se indica que no se puede seguir leyendo, se reinicia el quantum
+            (*Ejecucion)->PC--;
             fclose(n_archivo);
             (*SePuedeLeer) = 0;
             (*Quantum) = 0;
             ManejadorErroresArchivo(IDventanaMensajes, (*Ejecucion)->IR, codigoError);
+            Planificador(Listos, PBase,W);
         }
     }
     else
@@ -774,6 +940,15 @@ int LeerArchivo(WINDOW *IDventanaMensajes, WINDOW *IDventanaRegistros, struct PC
         (*ProcesoCargado) = 0;
         InsertarNuevo(Listos, *Ejecucion);
         Kill(Ejecucion, (*Ejecucion)->PID);
+
+        //Imprime la prioridad y el peso del nodo listos
+
+        if(NumeroUsuarios != 0){
+          W=1.0/NumeroUsuarios;
+        }
+        Planificador(Listos, PBase,W);
+        
+
         (*Quantum) = 0;
     }
 
@@ -820,35 +995,61 @@ void ManejadorProcesos(WINDOW *IDventanaMensajes, struct PCB **Listos, struct PC
   {
     // Se carga un nuevo proceso en la lista de procesos listos.
     strcpy(ArchivoCargadoValido, ArchivoCargado);
-    Insertar(Listos, ArchivoCargadoValido);
+    Insertar(Listos, ArchivoCargadoValido,PBase,IDUs);
+
+    //Peso de los usuarios
+
+    if (NumeroUsuarios != 0)
+    {
+      W=1.0/NumeroUsuarios;
+    }
   }
+
   // Verifica si se está eliminando un proceso.
   else if (EjecucionComandos == 301)
   {
     // Se elimina un proceso de la lista de procesos listos o de ejecución, y se coloca en la lista de procesos terminados.
     EstadoProcesos = KillFinal(Listos, atoi(PIDKill), Terminados);
+    // Si el proceso no se encuentra en ninguna lista, se muestra un mensaje de error.
     if (EstadoProcesos != 0)
     {
       EstadoProcesos = KillFinal(Ejecucion, atoi(PIDKill), Terminados);
+      
       if (EstadoProcesos != 0)
       {
         ManejadorErroresEjecucion(IDventanaMensajes, 1);
+        if(NumeroUsuarios != 0){
+          W=1.0/NumeroUsuarios;
+        }
 
       }
+      //Peso de los usuarios
       else
       {
         *SePuedeLeer = 0;
         *ProcesoCargado = 0;
         ManejadorErroresEjecucion(IDventanaMensajes, 2);
+        if(NumeroUsuarios != 0){
+          W=1.0/NumeroUsuarios;
+        }
+      }
+      if(NumeroUsuarios != 0){
+        W=1.0/NumeroUsuarios;
       }
     }
+    else{
+      if(NumeroUsuarios != 0){
+        W=1.0/NumeroUsuarios;
+      }
+    }
+
   }
-  
   // Verifica si no hay un proceso cargado.
   if (*ProcesoCargado == 0)
   {
     // Si no hay un proceso cargado, se extrae el primer proceso de la lista de procesos listos y se marca como cargado y habilita la lectura.
     *Ejecucion = listaExtraeInicio(Listos);
+    // Verifica si se extrajo un proceso de la lista de procesos listos.
     if (*Ejecucion != NULL)
     {
       *ProcesoCargado = 1;
@@ -859,7 +1060,6 @@ void ManejadorProcesos(WINDOW *IDventanaMensajes, struct PCB **Listos, struct PC
       *SePuedeLeer = 0;
     }
   }
-  
   // Verifica si hay un proceso cargado y no se puede leer el archivo.
   if (*ProcesoCargado == 1)
   {
@@ -868,10 +1068,13 @@ void ManejadorProcesos(WINDOW *IDventanaMensajes, struct PCB **Listos, struct PC
       // Si hay un proceso cargado y no se puede leer el archivo, se coloca el proceso en la lista de procesos terminados y se marca como no cargado.
       ListaInsertarFinal(Terminados, *Ejecucion);
       *ProcesoCargado = 0;
+      
+      if(NumeroUsuarios != 0){
+        W=1.0/NumeroUsuarios;
+      }
     }
   }
 }
-
 
 /**
  * LineaComandos
@@ -894,11 +1097,11 @@ void ManejadorProcesos(WINDOW *IDventanaMensajes, struct PCB **Listos, struct PC
  *   - Si se presiona Enter, agrega un caracter nulo al final del comando, incrementa el número de líneas y devuelve el estado "Enter".
  *   - Si se presiona Backspace y el cursor no está al inicio, decrementa el índice del caracter actual, elimina el caracter de la pantalla, mueve el cursor un caracter a la izquierda, borra el caracter anterior y 5 espacios más, y actualiza la pantalla.
  *   - Si se presiona la secuencia para las flechas, obtiene la siguiente tecla y realiza diferentes acciones dependiendo de la tecla presionada:
- *     - Si se presiona la flecha derecha y el retardo es menor a 800000 microsegundos, aumenta el retardo en 50000 microsegundos.
- *     - Si se presiona la flecha izquierda y el retardo es mayor a 0, disminuye el retardo en 50000 microsegundos.
+ *   - Si se presiona la flecha derecha y el retardo es menor a 800000 microsegundos, aumenta el retardo en 50000 microsegundos.
+ *   - Si se presiona la flecha izquierda y el retardo es mayor a 0, disminuye el retardo en 50000 microsegundos.
  *   - Si se presiona cualquier otra tecla, almacena la tecla en el comando, agrega un caracter nulo al final, y incrementa el índice del caracter actual.
- * - Si el número de líneas supera el límite de 20, limpia todas las líneas de la ventana de comandos, restablece el número de líneas a 0 y actualiza la pantalla.
- * - Finalmente, devuelve el estado "Normal".
+ *   - Si el número de líneas supera el límite de 20, limpia todas las líneas de la ventana de comandos, restablece el número de líneas a 0 y actualiza la pantalla.
+ *   - Finalmente, devuelve el estado "Normal".
  */
 int LineaComandos(WINDOW *IDventanaPromt, char *ComandoIngresado, int *j, int *NumLinea, char Historial[20][100])
 {
@@ -1042,10 +1245,6 @@ int LineaComandos(WINDOW *IDventanaPromt, char *ComandoIngresado, int *j, int *N
   return 0;
 }
 
-
-
-
-
 /*
  * Main
  * 
@@ -1164,13 +1363,12 @@ int main(void)
       ImprimirEjecutandose(IDventanaProcesos, Ejecucion);
       ImprimirListos(IDventanaProcesos, Listos);
       ImprimirTerminados(IDventanaProcesos, Terminados);
+      IdentificadorProcesos(IDventanaProcesos, Ejecucion, Listos, &NumeroUsuarios);
       mvwprintw(IDventanaProcesos, 7, 2, "                                                                        ");
-
-
 
     //Solo leer cada 5 iteraciones para poder escribir en la ventana de comandos
     //sin tanto delay
-      if (SePuedeLeer == 1 && ContadorLectura < 10)
+      if (SePuedeLeer == 1 && ContadorLectura < 1000)
       {
         ContadorLectura++;
       }
@@ -1194,7 +1392,6 @@ int main(void)
     LiberarMemoria(Ejecucion);
     LiberaListos(&Listos);
     LiberaTerminados(&Terminados);
-
 
     return 0;
 }
