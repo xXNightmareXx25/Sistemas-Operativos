@@ -188,7 +188,28 @@ void InsertarNuevo(struct PCB **PrimerNodo, struct PCB *ejecucion) {
     Ultimo->sig = nuevoNodo;
 }
 
+/*
+    * AsignarMarcos
 
+    Prototipo:
+    void AsignarMarcos(struct PCB *nuevoNodo, FILE *SWAP, char *nombrePrograma, int Repetido);
+    * 
+    * Parámetros:
+    * - nuevoNodo: Puntero al nodo que se va a insertar
+    * - SWAP: Puntero al archivo de SWAP
+    * - nombrePrograma: Nombre del archivo del programa
+    * - Repetido: PID del proceso hermano
+    * 
+    * Objetivo:
+    * - Asignar marcos a un proceso
+    * 
+    * Descripción:
+    * - Asigna marcos a un proceso.
+    * - Si el proceso es nuevo, busca marcos libres y los asigna al proceso.
+    * - Si el proceso es un proceso hermano, busca los marcos asignados al proceso hermano y los asigna al proceso.
+    * - Abre el archivo asociado al proceso y copia las instrucciones en SWAP.
+    
+*/
 void AsignarMarcos(struct PCB *nuevoNodo, FILE *SWAP, char *nombrePrograma, int Repetido) {
     if (Repetido == -1) {
         int marcosAsignados = 0;
@@ -249,6 +270,29 @@ void AsignarMarcos(struct PCB *nuevoNodo, FILE *SWAP, char *nombrePrograma, int 
     }
 }
 
+
+/*InsertarTemporal
+
+    *Prototipo:
+    void InsertarTemporal(struct PCB **PrimerNodo, char *nombrePrograma, int PBase, int IDUs); 
+    * Parámetros:
+    * - PrimerNodo: Puntero al puntero del primer nodo de la lista
+    * - nombrePrograma: Nombre del archivo del programa
+    * - PBase: Prioridad base del proceso
+    * - IDUs: Identificador del usuario dueño del proceso
+    * 
+    * Objetivo:
+    * - Insertar un nuevo nodo al final de la lista
+    * 
+    * Descripción:
+    * - Crea un nuevo nodo y copia los datos del nodo "ejecucion" en él.
+    * - Inserta el nuevo nodo al final de la lista.
+    * - Si la lista está vacía, el nuevo nodo se convierte en el primer nodo.
+    * - Asigna un PID al nuevo nodo.
+    * - Abre el archivo asociado al nuevo nodo.
+    
+
+*/
 void InsertarTemporal(struct PCB **PrimerNodo, char *nombrePrograma, int PBase, int IDUs) {
     struct PCB *nuevoNodo = (struct PCB*)malloc(sizeof(struct PCB));
     // Verifica si se pudo reservar memoria
@@ -302,9 +346,12 @@ void InsertarTemporal(struct PCB **PrimerNodo, char *nombrePrograma, int PBase, 
     * 
     * Parámetros:
     * - PrimerNodo: Puntero al puntero del primer nodo de la lista
+    * - Nuevos: Puntero al puntero del primer nodo de la lista de procesos nuevos
     * - nombrePrograma: Nombre del archivo del programa
     * - PBase: Prioridad base del proceso
     * - IDUs: Identificador del usuario dueño del proceso
+    * - SWAP: Puntero al archivo de SWAP
+    * - Repetido: PID del proceso hermano
     * 
     * Objetivo:
     * - Insertar un nuevo nodo al final de la lista
@@ -315,6 +362,11 @@ void InsertarTemporal(struct PCB **PrimerNodo, char *nombrePrograma, int PBase, 
     * - Si la lista está vacía, el nuevo nodo se convierte en el primer nodo.
     * - Asigna un PID al nuevo nodo.
     * - Abre el archivo asociado al nuevo nodo.
+    * - Verifica si hay marcos libres suficientes para asignar al proceso.
+    * - Si hay marcos libres suficientes, asigna los marcos al proceso.
+    * - Si no hay marcos libres suficientes, inserta el proceso en la lista de procesos nuevos.
+    * - Si hay un proceso hermano, que se inserte en la lista de listos.
+    * - Retorna 0 si el proceso se insertó correctamente, -1 si no se pudo abrir el archivo.
     */
 int contadorPID = 1;
 int Insertar(struct PCB **PrimerNodo, struct PCB **Nuevos, char *nombrePrograma, int PBase, int IDUs, FILE *SWAP, int Repetido) {
