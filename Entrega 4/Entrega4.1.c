@@ -20,9 +20,15 @@ int IDUs=0;
 float W=0.0;
 char Users[200];
 int MinP=0;
+int DezplazamientoSwap = 0;
+int DezplazamientoTMP = 0;
+int DezplazamientoTMS = 0;
 
 /**
  * VentanaMensajes
+ * 
+ * Prototipo:
+ * void (WINDOW, char *);
  * 
  * Parámetros:
  * - IDventanaMensajes: Puntero a la ventana de mensajes.
@@ -52,6 +58,9 @@ void VentanaMensajes(WINDOW *IDventanaMensajes, char *mensaje)
 /**
  * VentanaPrompt
  * 
+ * Prototipo:
+ * void (WINDOW, int, char *);
+ * 
  * Parámetros:
  * - IDventanaPromt: Puntero a la ventana de prompt.
  * - NumLinea: Número de línea en la ventana.
@@ -80,6 +89,9 @@ void VentanaPrompt(WINDOW *IDventanaPromt, int NumLinea, char *ComandoIngresado)
 
 /**
  * VentanaRegistros
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
  *  
  * Parámetros:
  * - IDventanaRegistros: Puntero a la ventana de registros.
@@ -121,10 +133,32 @@ void VentanaRegistros(WINDOW *IDventanaRegistros, struct PCB *pcb)
     wrefresh(IDventanaRegistros);
 }
 
+/*VentanaSwap 
+ *
+ * Prototipo:
+ * void (WINDOW, FILE *);
+ * 
+ * Parámetros:
+ * - IDventanaSwap: Puntero a la ventana de Swap.
+ * - SWAP: Puntero al archivo Swap.
+ * 
+ * Prototipo:
+ * void (WINDOW, FILE *);
+ * 
+ * Objetivo:
+ * - Imprimir el contenido del archivo Swap en la ventana.
+ * 
+ * Descripción:
+ * - Esta función configura el color de fondo de la ventana de Swap y dibuja un borde alrededor de ella.
+ * - Imprime el título "SWAP" en la parte superior de la ventana.
+ * - Lee el contenido del archivo Swap y lo imprime en la ventana.
+ * - Actualiza la ventana de Swap.
+
+*/
 
     // Imprimir el contenido del archivo Swap en la ventana
 
-void VentanaSwap(WINDOW *IDventanaSwap, FILE *SWAP)
+void VentanaSwap(WINDOW *IDventanaSwap, FILE *SWAP, int DezplazamientoSwap)
 {
     int height, width;
     getmaxyx(IDventanaSwap, height, width);
@@ -137,7 +171,7 @@ void VentanaSwap(WINDOW *IDventanaSwap, FILE *SWAP)
     //Desplazamiento de 32 bytes
     int offset = 32;
     //Ajustar la posicion base en x con el desplazamiento horizontal
-    int base_x = 2 - (offset + (offset % 32));
+    int base_x = 2 - (DezplazamientoSwap + (DezplazamientoSwap % 32));
     int base_y = 1;
 
     long direccion = 0;
@@ -187,7 +221,25 @@ void VentanaSwap(WINDOW *IDventanaSwap, FILE *SWAP)
       wrefresh(IDventanaSwap);
 }
 
-
+/**
+ * VentanaDirSwap
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
+ * Parámetros:
+ * - IDventanaDirSwap: Puntero a la ventana de direcciones de Swap.
+ * - pcb: Puntero a la estructura PCB.
+ * 
+ * Objetivo:
+ * - Mostrar las direcciones de Swap en la ventana de direcciones de Swap.
+ * 
+ * Descripción:
+ * - Esta función configura el color de fondo de la ventana de direcciones de Swap y dibuja un borde alrededor de ella.
+ * - Imprime el título "DIRECCIONES DE SWAP" en la parte superior de la ventana.
+ * - Muestra la dirección de Swap, el valor de DRS y la instrucción IR en la ventana.
+ * - Actualiza la ventana de direcciones de Swap y vuelve a dibujar el borde.
+ */
 void VentanaDirSwap(WINDOW *IDventanaDirSwap, struct PCB *pcb)
 {
     int height, width;
@@ -199,6 +251,24 @@ void VentanaDirSwap(WINDOW *IDventanaDirSwap, struct PCB *pcb)
     wrefresh(IDventanaDirSwap);
 }
 
+/*VentanaTMS
+  *
+  * Prototipo:
+  * void (WINDOW *);
+  * 
+  * Parámetros:
+  * - IDventanaTMS: Puntero a la ventana de TMS.
+  * 
+  * Objetivo:
+  * - Mostrar la tabla de marcos de memoria en la ventana de TMS.
+  * 
+  * Descripción:
+  * - Esta función configura el color de fondo de la ventana de TMS y dibuja un borde alrededor de ella.
+  * - Imprime el título "TMS" en la parte superior de la ventana.
+  * - Muestra la tabla de marcos de memoria en la ventana.
+  * - Actualiza la ventana de TMS y vuelve a dibujar el borde.
+  
+*/
 void VentanaTMS(WINDOW *IDventanaTMS)
 {
     int height, width;
@@ -217,6 +287,28 @@ void VentanaTMS(WINDOW *IDventanaTMS)
     wrefresh(IDventanaTMS);
 }
 
+/**
+ * VentanaTMP
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
+ * Parámetros:
+ * - IDventanaTMP: Puntero a la ventana de TMP.
+ * - pcb: Puntero a la estructura PCB.
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
+ * Objetivo:
+ * - Mostrar la tabla de marcos de página en la ventana de TMP.
+ * 
+ * Descripción:
+ * - Esta función configura el color de fondo de la ventana de TMP y dibuja un borde alrededor de ella.
+ * - Imprime el título "TMP" en la parte superior de la ventana.
+ * - Muestra la tabla de marcos de página en la ventana.
+ * - Actualiza la ventana de TMP y vuelve a dibujar el borde.
+ */
 void VentanaTMP(WINDOW *IDventanaTMP,struct PCB *pcb)
 {
     int height, width;
@@ -254,9 +346,15 @@ void VentanaTMP(WINDOW *IDventanaTMP,struct PCB *pcb)
 /**
  * ImprimirEjecutandose
  * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
  * Parámetros:
  * - IDventanaProcesos: Puntero a la ventana de procesos.
  * - PrimerNodo: Puntero al primer nodo de la lista de PCB.
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
  * 
  * Objetivo:
  * - Imprimir la información del proceso en ejecución en la ventana de procesos.
@@ -270,11 +368,10 @@ void VentanaTMP(WINDOW *IDventanaTMP,struct PCB *pcb)
 void ImprimirEjecutandose(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
 {
   struct PCB *primerNodo = PrimerNodo; // Guarda referencia al primer nodo
-  struct PCB *NodoActual = PrimerNodo;
 
   // Limpiar la sección de Proceso en Ejecución
-  mvwprintw(IDventanaProcesos, 3, 2, "                                                                                               ");
-  mvwprintw(IDventanaProcesos, 4, 2, "                                                                                               ");
+  mvwprintw(IDventanaProcesos, 3, 2, "                                                                                                           ");
+  mvwprintw(IDventanaProcesos, 3, 2, "                                                                                                        ");
 
   if (primerNodo != NULL)
   {
@@ -290,14 +387,26 @@ void ImprimirEjecutandose(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
     wrefresh(IDventanaProcesos);
 
   }
+  else{
+    mvwprintw(IDventanaProcesos, 3, 2, "                                                                                                           ");
+    mvwprintw(IDventanaProcesos, 3, 2, "                                                                                                        ");
+    wrefresh(IDventanaProcesos);
+
+  }
 }
 
 /**
  * ImprimirListos
  * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
  * Parámetros:
  * - IDventanaProcesos: Puntero a la ventana de procesos.
  * - PrimerNodo: Puntero al primer nodo de la lista de PCB.
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
  * 
  * Objetivo:
  * - Imprimir la información de los procesos en espera en la ventana de procesos.
@@ -319,7 +428,7 @@ void ImprimirListos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
     wbkgd(IDventanaProcesos, COLOR_PAIR(4));
     box(IDventanaProcesos, 0, 0);
     mvwprintw(IDventanaProcesos, 0, 2, "LISTA DE PROCESOS");
-    mvwprintw(IDventanaProcesos, 5, 2, "Procesos en Espera:");
+    mvwprintw(IDventanaProcesos, 10, 2, "Procesos en Espera:");
     while (NodoActual != NULL)
     {
       wmove(IDventanaProcesos, 11 + i, 2);
@@ -330,7 +439,7 @@ void ImprimirListos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
       NodoActual = NodoActual->sig;
       i++;
       contador++; // Incrementar el contador de procesos en espera
-      mvwprintw(IDventanaProcesos, 10 + contador, 2, "                                                                                                     ");
+      mvwprintw(IDventanaProcesos, 10 + contador, 2, "                                                                                                                        ");
 
                                  
     }
@@ -346,9 +455,15 @@ void ImprimirListos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
 /**
  * ImprimirTerminados
  * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
  * Parámetros:
  * - IDventanaProcesos: Puntero a la ventana de procesos.
  * - PrimerNodo: Puntero al primer nodo de la lista de PCB.
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
  * 
  * Objetivo:
  * - Imprimir la información de los procesos terminados en la ventana de procesos.
@@ -386,6 +501,27 @@ void ImprimirTerminados(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
   }
 }
 
+/**
+ * ImprimirNuevos
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
+ * Parámetros:
+ * - IDventanaProcesos: Puntero a la ventana de procesos.
+ * - PrimerNodo: Puntero al primer nodo de la lista de PCB.
+ * 
+ * Prototipo:
+ * void (WINDOW, struct PCB *);
+ * 
+ * Objetivo:
+ * - Imprimir la información de los procesos nuevos en la ventana de procesos.
+ * 
+ * Descripción:
+ * - Esta función recorre la lista de PCB y muestra la información de los procesos nuevos en la ventana de procesos.
+ * - La información impresa incluye el PID, nombre del archivo, valores de los registros AX, BX, CX, DX, PC, IR, KCPU, KCPUxU, UID y P.
+ * - La ventana de procesos se actualiza y se vuelve a dibujar el borde después de imprimir la información.
+ */
 void ImprimirNuevos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
 {
   int height, width;
@@ -412,6 +548,7 @@ void ImprimirNuevos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
     mvwprintw(IDventanaProcesos, 0, 2, "LISTA DE PROCESOS");              // Título
     wrefresh(IDventanaProcesos);  // Actualizar la ventana
   }
+  wrefresh(IDventanaProcesos);
 
 }
 
@@ -427,6 +564,8 @@ void ImprimirNuevos(WINDOW *IDventanaProcesos, struct PCB *PrimerNodo)
 /**
  * ManejadorErroresComandos
  * 
+ * Prototipo:
+ * int (WINDOW, WINDOW, int, char *, int *, int *);
  * Parámetros:
  * - IDventanaPrompt: Puntero a la ventana del prompt.
  * - IDventanaMensajes: Puntero a la ventana de mensajes.
@@ -591,6 +730,9 @@ int ManejadorErroresComandos(WINDOW *IDventanaPrompt, WINDOW *IDventanaMensajes,
 /**
  * ManejadorErroresArchivo
  * 
+ * Prototipo:
+ * void (WINDOW, char *, int);
+ * 
  * Parámetros:
  * - IDventanaMensajes: Puntero a la ventana de mensajes.
  * - linea: Cadena de caracteres que contiene la línea de código.
@@ -717,6 +859,9 @@ void ManejadorErroresArchivo(WINDOW *IDventanaMensajes, char linea[32], int Opci
 /**
  * ManejadorErroresEjecucion
  * 
+ * Prototipo:
+ * void (WINDOW, int);
+ * 
  * Parámetros:
  * - IDventanaMensajes: Puntero a la ventana de mensajes.
  * - Opcion: Opción que indica el tipo de error a manejar.
@@ -794,6 +939,8 @@ void ManejadorErroresSWAP(WINDOW *IDventanaMensajes, int Opcion)
 
 /**
  * Enter
+ * Prototipo:
+ * int (char *);
  * 
  * Parámetros:
  * - ComandoIngresado: Puntero al comando ingresado por el usuario.
@@ -921,7 +1068,9 @@ int Enter(char *ComandoIngresado)
 
 /*
     *IdentificadorProcesos
-    *
+    
+    * Prototipo:
+    * int (WINDOW, struct PCB *, struct PCB *, int *);
     * Parámetros:
     * - IDventanaProcesos: Puntero a la ventana de procesos.
     * - NodoEjecucion: Puntero al primer nodo de la lista de procesos en ejecución.
@@ -996,13 +1145,16 @@ int IdentificadorProcesos(WINDOW *IDventanaProcesos, struct PCB *NodoEjecucion, 
 
   // Imprimir el número de procesos en la ventana de procesos
   MinP=MinimaPrioridad();
-  mvwprintw(IDventanaProcesos, 2, 2, "Usuarios: %d        MinP:%d       W: %.3f", (*ProcesoCargado), MinP, W);
+  mvwprintw(IDventanaProcesos, 1, 30, "Usuarios: %d        MinP:%d       W: %.3f", (*ProcesoCargado), MinP, W);
   wrefresh(IDventanaProcesos);
 
 }
 
 /*
     * Planificador.
+
+    Prototipo:
+    void (struct PCB **, int, float);
     * 
     * Prototipo de la funcion, agregar. 
     * 
@@ -1039,6 +1191,9 @@ void Planificador(struct PCB **PrimerNodo, int PBase, float W){
 
 /**
  * LeerArchivo
+ * 
+ * Prototipo:
+ * int (WINDOW, WINDOW, struct PCB **, int *, FILE *, int *, int *, struct PCB **);
  * 
  * Parámetros:
  * - IDventanaMensajes: Puntero a la ventana de mensajes.
@@ -1170,6 +1325,35 @@ int LeerArchivo(WINDOW *IDventanaMensajes, WINDOW *IDventanaProcesos, WINDOW *ID
     return 0;
 }
 
+
+/*BuscarProcesoRepetido
+ * 
+ * Prototipo:
+ * int (struct PCB *, struct PCB *, char *, int, int);
+ * 
+ * Parámetros:
+ * - Listos: Puntero al primer nodo de la lista de procesos listos.
+ * - Ejecucion: Puntero al primer nodo de la lista de procesos en ejecución.
+ * - nombreArchivo: Nombre del archivo del proceso.
+ * - IDUs: ID del usuario del proceso.
+ * - Opcion: Opción para buscar el proceso repetido.
+ * 
+ * Valor de retorno:
+ * - El PID del proceso hermano mayor encontrado.
+ * - El PID del proceso hermano menor encontrado.
+ * - El PID del primer proceso encontrado.
+ * - -1 si la opción es inválida.
+ * 
+ * Objetivo:
+ * - Buscar un proceso repetido en la lista de procesos listos y en ejecución.
+ * 
+ * Descripción:
+ * - La función BuscarProcesoRepetido recibe la lista de procesos listos, la lista de procesos en ejecución, el nombre del archivo del proceso, el ID del usuario del proceso y la opción para buscar el proceso repetido.
+ * - La función recorre la lista de procesos listos y en ejecución para buscar un proceso con el mismo nombre de archivo y el mismo ID de usuario.
+ * - Si se encuentra un proceso repetido, la función devuelve el PID del proceso hermano mayor, del proceso hermano menor o del primer proceso encontrado según la opción seleccionada.
+ * - Si no se encuentra un proceso repetido, la función libera el marco de la tabla de marcos de página.
+ 
+*/
 int BuscarProcesoRepetido(struct PCB *Listos, struct PCB *Ejecucion, char *nombreArchivo, int IDUs, int Opcion) {
     int mayorPID = -1;  // PID del proceso hermano mayor encontrado
     int menorPID = -1;  // PID del proceso hermano menor encontrado
@@ -1241,34 +1425,40 @@ void ActualizarTMS(struct PCB *Listos, struct PCB *Ejecucion, char *nombreArchiv
 
 
 
-/**
- * ManejadorProcesos
- * 
- * Parámetros:
- * - IDventanaMensajes: Puntero a la ventana de mensajes.
- * - Listos: Puntero al puntero de la lista de procesos listos.
- * - Terminados: Puntero al puntero de la lista de procesos terminados.
- * - Ejecucion: Puntero al puntero del proceso en ejecución.
- * - SePuedeLeer: Puntero a la variable que indica si se puede leer el archivo.
- * - ProcesoCargado: Puntero a la variable que indica si hay un proceso cargado.
- * - EjecucionComandos: Entero que indica el comando de ejecución.
- * - ArchivoCargadoValido: Cadena de caracteres que almacena el nombre del archivo cargado.
- * - EstadoProcesos: Entero que indica el estado de los procesos.
- * 
- * Valor de retorno:
- * - Ninguno.
- * 
- * Objetivo:
- * - Manejar los procesos, incluyendo la carga, eliminación y finalización de procesos.
- * 
- * Descripción:
- * - La función ManejadorProcesos se encarga de manejar los procesos en el sistema operativo. Recibe como parámetros un puntero a la ventana de mensajes (IDventanaMensajes), un puntero al puntero de la lista de procesos listos (Listos), un puntero al puntero de la lista de procesos terminados (Terminados), un puntero al puntero del proceso en ejecución (Ejecucion), un puntero a la variable que indica si se puede leer el archivo (SePuedeLeer), un puntero a la variable que indica si hay un proceso cargado (ProcesoCargado), un entero que indica el comando de ejecución (EjecucionComandos), una cadena de caracteres que almacena el nombre del archivo cargado (ArchivoCargadoValido) y un entero que indica el estado de los procesos (EstadoProcesos).
- * - La función realiza diferentes acciones dependiendo del comando de ejecución recibido:
- *   - Si el comando de ejecución es 201, se carga un nuevo proceso en la lista de procesos listos. El nombre del archivo cargado se almacena en la variable ArchivoCargadoValido.
- *   - Si el comando de ejecución es 301, se elimina un proceso de la lista de procesos listos o de ejecución, y se coloca en la lista de procesos terminados. Si el proceso no se encuentra en ninguna lista, se muestra un mensaje de error.
- *   - Si no hay un proceso cargado, se extrae el primer proceso de la lista de procesos listos y se marca como cargado y habilita la lectura.
- *   - Si hay un proceso cargado y no se puede leer el archivo, se coloca el proceso en la lista de procesos terminados y se marca como no cargado.
- */
+/*ManejadorProcesos
+  * 
+  * Prototipo:
+  * void (WINDOW, WINDOW, struct PCB **, struct PCB **, struct PCB **, struct PCB **, struct PCB **, int *, int *, int, char[200], int, FILE *);
+  * 
+  * Parámetros:
+  * - IDventanaMensajes: Puntero a la ventana de mensajes.
+  * - IDventanaProcesos: Puntero a la ventana de procesos.
+  * - Listos: Puntero al puntero de la lista de procesos listos.
+  * - Terminados: Puntero al puntero de la lista de procesos terminados.
+  * - Ejecucion: Puntero al puntero del PCB en ejecución.
+  * - Nuevos: Puntero al puntero de la lista de procesos nuevos.
+  * - Temporal: Puntero al puntero de la lista temporal.
+  * - SePuedeLeer: Puntero a la variable que indica si se puede leer el archivo.
+  * - ProcesoCargado: Puntero a la variable que indica si hay un proceso cargado.
+  * - EjecucionComandos: Valor que indica la ejecución de comandos.
+  * - ArchivoCargadoValido: Nombre del archivo cargado.
+  * - EstadoProcesos: Estado de los procesos.
+  * - SWAP: Puntero al archivo SWAP.
+  * 
+  * Objetivo:
+  * - Manejar los procesos.
+  * 
+  * Descripción:
+  * - La función ManejadorProcesos recibe los parámetros necesarios para manejar los procesos.
+  * - Verifica si se está cargando un nuevo proceso y lo inserta en la lista de procesos listos.
+  * - Verifica si se está eliminando un proceso y lo elimina de la lista de procesos listos.
+  * - Actualiza el peso de los usuarios.
+  * - Imprime la lista de procesos listos en la ventana de procesos.
+  * - Muestra mensajes de error en la ventana de mensajes según el estado de los procesos.
+  * - Si el número de marcos es mayor a 4096, muestra un mensaje de error y elimina el proceso.
+  * - Si el proceso ya existe, no se carga y se le asigna el TMP del proceso repetido.
+  * - Si el proceso no existe, se carga un nuevo proceso en la lista de procesos listos.
+*/
 void ManejadorProcesos(WINDOW *IDventanaMensajes, WINDOW* IDventanaProcesos,
                        struct PCB **Listos, struct PCB **Terminados, struct PCB **Ejecucion, struct PCB **Nuevos, 
                        struct PCB **Temporal, int *SePuedeLeer, int *ProcesoCargado, int EjecucionComandos, 
@@ -1455,31 +1645,38 @@ void ManejadorProcesos(WINDOW *IDventanaMensajes, WINDOW* IDventanaProcesos,
 /**
  * LineaComandos
  * 
+ * Prototipo:
+ * int (WINDOW *, WINDOW *, char *, int *, int *, char [10][100]);
+ * 
  * Parámetros:
  * - IDventanaPromt: Puntero a la ventana de comandos.
+ * - IDventanaSwap: Puntero a la ventana de la tabla de marcos de página.
+ * - IDventanaTMS: Puntero a la ventana de la tabla de marcos de página.
+ * - IDventanaTMP: Puntero a la ventana de la tabla de marcos de página.
  * - ComandoIngresado: Cadena de caracteres que almacena el comando ingresado por el usuario.
  * - j: Puntero a la posición actual en la cadena de caracteres del comando.
  * - NumLinea: Puntero al número de líneas en la ventana de comandos.
+ * - Historial: Arreglo de cadenas de caracteres que almacena el historial de comandos ingresados por el usuario.
  * 
  * Valor de retorno:
- * - Entero que indica el estado de la función.
+ * - 0 si el estado es "Normal".
+ * 
  * 
  * Objetivo:
- * - Manejar la entrada del usuario en la línea de comandos, procesando las teclas presionadas y actualizando la ventana de comandos.
+ * - Manejar la entrada del usuario en la línea de comandos.
+ * 
  * 
  * Descripción:
- * - La función LineaComandos se encarga de manejar la entrada del usuario en la línea de comandos de la ventana de comandos. Recibe como parámetros un puntero a la ventana de comandos (IDventanaPromt), una cadena de caracteres que almacena el comando ingresado por el usuario (ComandoIngresado), un puntero a la posición actual en la cadena de caracteres del comando (j) y un puntero al número de líneas en la ventana de comandos (NumLinea).
- * - La función verifica si hay una tecla disponible utilizando la función kbhit(). Si hay una tecla disponible, obtiene la tecla presionada utilizando la función getch(). Luego, realiza diferentes acciones dependiendo de la tecla presionada:
- *   - Si se presiona Enter, agrega un caracter nulo al final del comando, incrementa el número de líneas y devuelve el estado "Enter".
- *   - Si se presiona Backspace y el cursor no está al inicio, decrementa el índice del caracter actual, elimina el caracter de la pantalla, mueve el cursor un caracter a la izquierda, borra el caracter anterior y 5 espacios más, y actualiza la pantalla.
- *   - Si se presiona la secuencia para las flechas, obtiene la siguiente tecla y realiza diferentes acciones dependiendo de la tecla presionada:
- *   - Si se presiona la flecha derecha y el retardo es menor a 800000 microsegundos, aumenta el retardo en 50000 microsegundos.
- *   - Si se presiona la flecha izquierda y el retardo es mayor a 0, disminuye el retardo en 50000 microsegundos.
- *   - Si se presiona cualquier otra tecla, almacena la tecla en el comando, agrega un caracter nulo al final, y incrementa el índice del caracter actual.
- *   - Si el número de líneas supera el límite de 20, limpia todas las líneas de la ventana de comandos, restablece el número de líneas a 0 y actualiza la pantalla.
- *   - Finalmente, devuelve el estado "Normal".
+ * - La función LineaComandos recibe los parámetros necesarios para manejar la entrada del usuario en la línea de comandos.
+ * - La función verifica si hay una tecla disponible y obtiene la tecla presionada por el usuario.
+ * - Si se presiona Enter, la función agrega un caracter nulo al final del comando, incrementa el número de líneas y devuelve el estado "Enter".
+ * - Si se presiona Backspace y el cursor no está al inicio, la función decrementa el índice del caracter actual, elimina el caracter de la pantalla y actualiza la pantalla.
+ * - Si se presiona la secuencia para las flechas, la función obtiene la siguiente tecla y verifica si se presiona la flecha derecha o la flecha izquierda.
+ * - Si se presiona cualquier otra tecla, la función almacena la tecla en el comando, agrega un caracter nulo al final y actualiza el índice del caracter actual.
+ * - Si el número de líneas supera el límite, la función limpia todas las líneas.
+ * - Si se presiona la secuencia de teclas para el desplazamiento en la tabla de marcos de página, la función actualiza el desplazamiento en la tabla de marcos de página.
  */
-int LineaComandos(WINDOW *IDventanaPromt, WINDOW *IDventanaSwap, char *ComandoIngresado, int *j, int *NumLinea, char Historial[10][100])
+int LineaComandos(WINDOW *IDventanaPromt, WINDOW *IDventanaSwap, WINDOW *IDventanaTMS, WINDOW *IDventanaTMP, char *ComandoIngresado, int *j, int *NumLinea, char Historial[10][100])
 {
 
   
@@ -1543,22 +1740,25 @@ int LineaComandos(WINDOW *IDventanaPromt, WINDOW *IDventanaSwap, char *ComandoIn
         // Si se presiona la flecha derecha
         if (Tecla == 67)
         {
+
           // Si el retardo es menor a 6000000 microsegundos
           if (Delay < 6000000)
           {
             // Aumentar el retardo en 60000 microsegundos
-            Delay = Delay + 60000;
+            Delay = Delay + 50000;
           }
+
         }
 
         // Si se presiona la flecha izquierda
         else if (Tecla == 68)
         {
+
           // Si el retardo es mayor a 0
           if (Delay > 0)
           {
             // Disminuir el retardo en 60000 microsegundos
-            Delay = Delay - 60000;
+            Delay = Delay - 50000;
           }
         }
 
@@ -1579,48 +1779,46 @@ int LineaComandos(WINDOW *IDventanaPromt, WINDOW *IDventanaSwap, char *ComandoIn
           ContadorHistorial--;
           if (ContadorHistorial > 0)
           {
+
             strcpy(ComandoIngresado, Historial[*NumLinea - ContadorHistorial]);
             *j = strlen(ComandoIngresado);
             mvwprintw(IDventanaPromt, *NumLinea +1, 5, "                                   ");
           }
         }
 
-        // Si se presiona la tecla Control
-        else if (Tecla == 3)
-        {
-          // Desplazar el contenido de la ventana de swap a la derecha
-          scroll(IDventanaSwap);
-          // Actualizar la pantalla
-          wrefresh(IDventanaSwap);
-        }
-        // Si se presiona la tecla Alt
-        else if (Tecla == 27)
-        {
-          // Obtener la siguiente tecla
-          Tecla = getch();
-          // Si se presiona la tecla '['
-          if (Tecla == 91)
-          {
-            // Obtener la última tecla de la secuencia
-            Tecla = getch();
-            // Si se presiona la flecha izquierda
-            if (Tecla == 68)
-            {
-              // Desplazar el contenido de la ventana de swap a la izquierda
-              scroll(IDventanaSwap);
-              // Actualizar la pantalla
-              wrefresh(IDventanaSwap);
-            }
-          }
-        }
-
-
-
-
-
-
       }
     }
+    //Dezplazamiento en Swap
+        else if (Tecla == '+')
+        {
+
+            DezplazamientoSwap = DezplazamientoSwap + 32;
+            VentanaSwap(IDventanaSwap, NULL, DezplazamientoSwap);
+
+        }
+
+
+        else if (Tecla == '-')
+        {
+
+            DezplazamientoSwap = DezplazamientoSwap - 32;
+            VentanaSwap(IDventanaSwap, NULL, DezplazamientoSwap);
+
+        }
+
+    //Dezplazamiento en TMS
+        else if (Tecla == '/')
+        {
+
+            DezplazamientoTMS = DezplazamientoTMS + 16;
+            VentanaTMS(IDventanaTMS);
+        }
+        else if(Tecla == '*')
+        {
+            DezplazamientoTMS = DezplazamientoTMS - 16;
+            VentanaTMS(IDventanaTMS);
+        }
+
 
     // Si se presiona cualquier otra tecla
     else
@@ -1659,7 +1857,28 @@ int LineaComandos(WINDOW *IDventanaPromt, WINDOW *IDventanaSwap, char *ComandoIn
 }
 
 
+/*FILE* CrearSwap
 
+Prototipo:
+FILE* CrearSwap(WINDOW *);
+
+Parámetros:
+- IDventanaMensajes: Puntero a la ventana de mensajes.
+Valor de retorno:
+- Puntero al archivo SWAP.
+
+Objetivo:
+- Crear un archivo binario llamado SWAP.
+
+Descripción:
+- La función CrearSwap crea un archivo binario llamado SWAP. La unidad de almacenamiento será 1 instrucción (32 caracteres), considerando un tamaño de 65536 instrucciones.
+- La función crea un buffer de 32 caracteres con todos los bits inicializados a 0.
+- La función escribe el buffer 65536 veces en el archivo SWAP.
+- Si se produce un error al crear el archivo SWAP, se muestra un mensaje de error en la ventana de mensajes.
+- Si el archivo SWAP se crea correctamente, se muestra un mensaje de éxito en la ventana de mensajes.
+- La función retorna el puntero al archivo SWAP.
+
+*/
 
 FILE* CrearSwap(WINDOW *IDventanaMensajes) {
     //-----------------------Archivo SWAP-----------------------
@@ -1773,7 +1992,7 @@ int main(void)
     mvwprintw(IDventanaProcesos, 0, 2, "LISTA DE PROCESOS");
     mvwprintw(IDventanaProcesos, 2, 2, "Proceso en Ejecucion: ");
     mvwprintw(IDventanaProcesos, 3, 2, "...");
-    mvwprintw(IDventanaProcesos, 5, 2, "Procesos en Espera: ");
+    mvwprintw(IDventanaProcesos, 10, 2, "Procesos en Espera: ");
     mvwprintw(IDventanaProcesos, 6, 2, "...");
     mvwprintw(IDventanaProcesos, height / 3, 2, "Procesos Terminados: ");
     mvwprintw(IDventanaProcesos, height / 3 + 1, 2, "...");
@@ -1836,12 +2055,13 @@ int main(void)
 
       VentanaTMP(IDventanaTMP, Ejecucion);
 
-      VentanaSwap(IDventanaSwap, SWAP);
+      VentanaSwap(IDventanaSwap, SWAP, DezplazamientoSwap);
+
 
       //strcpy(HistorialComandos[NumLineas % 10], ComandoIngresado);
       // Actualizar la ventana SWAP
       // Obtener el estado de la línea de comandos
-      EstadoLineaComandos = LineaComandos(IDventanaPromt, IDventanaSwap, ComandoIngresado, &CharPos, &NumLineas, HistorialComandos);
+      EstadoLineaComandos = LineaComandos(IDventanaPromt, IDventanaSwap, IDventanaTMS, IDventanaTMP, ComandoIngresado, &CharPos, &NumLineas, HistorialComandos);
       // Ejecutar comandos y manejar errores
       EjecucionComandos = ManejadorErroresComandos(IDventanaPromt, IDventanaMensajes, EstadoLineaComandos, ComandoIngresado, &CharPos, &NumLineas);
       // Manejar procesos y ejecución de comandos
@@ -1851,14 +2071,14 @@ int main(void)
       ImprimirEjecutandose(IDventanaProcesos, Ejecucion);
 
       if(Ejecucion==NULL){
-        mvwprintw(IDventanaProcesos, 2, 2, "                                                                        "); 
+        mvwprintw(IDventanaProcesos, 3, 2, "                                                                                                             "); 
         wrefresh(IDventanaProcesos);
       }
       ImprimirListos(IDventanaProcesos, Listos);
       ImprimirTerminados(IDventanaProcesos, Terminados);
       ImprimirNuevos(IDventanaProcesos, Nuevos);
       IdentificadorProcesos(IDventanaProcesos, Ejecucion, Listos, &NumeroUsuarios);
-      mvwprintw(IDventanaProcesos, 7, 2, "                                                                        ");
+      mvwprintw(IDventanaProcesos, 7, 2, "                                                                                                           ");
 
       IdentificadorProcesos(IDventanaProcesos, Ejecucion, Listos, &NumeroUsuarios);
       
